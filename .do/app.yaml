@@ -5,7 +5,7 @@ region: nyc
 static_sites:
 - name: demo-site
   github:
-    repo: IncomeStreamSurfer/context-engineering-intro
+    repo: steveraju/ucip
     branch: main
     deploy_on_push: true
   source_dir: static-demo
@@ -22,7 +22,7 @@ static_sites:
 # services:
 # - name: api
 #   github:
-#     repo: IncomeStreamSurfer/context-engineering-intro
+#     repo: steveraju/ucip
 #     branch: main
 #     deploy_on_push: true
 #   dockerfile_path: Dockerfile.simple
@@ -36,6 +36,21 @@ static_sites:
 #   http_port: 8080
 #   routes:
 #   - path: /api
+
+# Optional: Database for full application
+# databases:
+# - name: consultant-intelligence-db
+#   engine: PG
+#   version: "15"
+#   num_nodes: 1
+#   size: db-s-dev-database
+
+# Optional: Redis for caching
+# - name: consultant-intelligence-cache
+#   engine: REDIS
+#   version: "7"
+#   num_nodes: 1
+#   size: db-s-dev-database
 
 # Monitoring and alerts
 alerts:

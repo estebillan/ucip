@@ -1,43 +1,83 @@
-# Context Engineering Template
+# 🧠 Universal Consultant Intelligence Platform (UCIP)
 
-A comprehensive template for getting started with Context Engineering - the discipline of engineering context for AI coding assistants so they have the information necessary to get the job done end to end.
+> AI-powered research and intelligence platform for consultants
 
-> **Context Engineering is 10x better than prompt engineering and 100x better than vibe coding.**
+[![Deploy to DigitalOcean](https://img.shields.io/badge/Deploy%20to-DigitalOcean-0080FF?style=for-the-badge&logo=digitalocean)](https://cloud.digitalocean.com/apps)
+[![GitHub](https://img.shields.io/badge/GitHub-steveraju%2Fucip-181717?style=for-the-badge&logo=github)](https://github.com/steveraju/ucip)
 
-## 🔗 Links & Resources
+## 🚀 Overview
 
-- **📺 YouTube Channel**: [Income Stream Surfers](https://www.youtube.com/c/incomestreamsurfers) - Learn advanced AI automation techniques
-- **🏫 AI Automation School**: [Skool Community](https://www.skool.com/iss-ai-automation-school-6342/about) - Join our AI automation community
-- **🌐 SEO Grove**: [Live Website](https://seogrove.ai/) - See advanced AI automation in action (built with different methods)
+The Universal Consultant Intelligence Platform is a comprehensive AI-powered solution designed to revolutionize how consultants conduct research, analyze prospects, and generate insights. Built with modern technologies and enterprise-grade architecture.
+
+### ✨ Key Features
+
+- 🧠 **AI-Powered Research Synthesis** - OpenAI GPT-4 integration for intelligent content analysis
+- 🔍 **Smart Web Scraping** - Beautiful Soup-powered intelligent signal detection
+- 📊 **Prospect Scoring** - Advanced algorithms for opportunity identification
+- 📑 **Professional Reports** - ReportLab-powered PDF generation with custom templates
+- 🎯 **Real-time Dashboard** - TypeScript-powered responsive interface
+- 🛡️ **Enterprise Security** - Rate limiting, structured logging, and monitoring
+
+## 🏗️ Architecture
+
+### Backend Stack
+- **FastAPI** - Modern async Python web framework
+- **SQLModel** - Type-safe database operations with async support
+- **PostgreSQL** - Primary database with advanced indexing
+- **Redis** - Caching and background task queue
+- **OpenAI GPT-4** - AI research synthesis and content generation
+
+### Frontend Stack
+- **TypeScript/JavaScript** - Modern reactive interface
+- **HTML5/CSS3** - Responsive design with CSS Grid/Flexbox
+- **REST API Integration** - Real-time data synchronization
+
+### DevOps & Deployment
+- **Docker** - Multi-stage production builds
+- **DigitalOcean App Platform** - Cloud-native deployment
+- **GitHub Actions** - Automated CI/CD pipeline
+- **Nginx** - Production-ready reverse proxy
 
 ## 🚀 Quick Start
 
-**For full setup with automatic documentation hooks:** See [SETUP.md](SETUP.md)
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- Docker & Docker Compose
+- DigitalOcean account (for deployment)
 
-**For basic template usage:**
+### Local Development
 
-```bash
-# 1. Clone this template
-git clone https://github.com/IncomeStreamSurfer/context-engineering-intro.git
-cd context-engineering-intro
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/steveraju/ucip.git
+   cd ucip
+   ```
 
-# 2. Set up your project rules (optional - template provided)
-# Edit CLAUDE.md to add your project-specific guidelines
+2. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys and configuration
+   ```
 
-# 3. Add examples (highly recommended)
-# Place relevant code examples in the examples/ folder
+3. **Docker Development**
+   ```bash
+   docker-compose up --build
+   ```
 
-# 4. Create your initial feature request
-# Edit INITIAL.md with your feature requirements
+4. **Access the Application**
+   - Application: http://localhost:8000
+   - Frontend: http://localhost:3000
+   - API Documentation: http://localhost:8000/docs
 
-# 5. Generate a comprehensive PRP (Product Requirements Prompt)
-# In Claude Code, run:
-/generate-prp INITIAL.md
+### Production Deployment
 
-# 6. Execute the PRP to implement your feature
-# In Claude Code, run:
-/execute-prp PRPs/your-feature-name.md
-```
+The platform is configured for automatic deployment to DigitalOcean App Platform:
+
+1. **Fork this repository**
+2. **Set up GitHub secrets**: `DIGITALOCEAN_ACCESS_TOKEN`
+3. **Push to main branch** - automatic deployment triggers
+4. **Monitor at**: [DigitalOcean Dashboard](https://cloud.digitalocean.com/apps)
 
 ## 📚 Table of Contents
 
