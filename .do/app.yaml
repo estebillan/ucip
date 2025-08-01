@@ -5,7 +5,7 @@ region: nyc
 static_sites:
 - name: demo-site
   github:
-    repo: steveraju/ucip
+    repo: estebillan/ucip
     branch: main
     deploy_on_push: true
   source_dir: static-demo

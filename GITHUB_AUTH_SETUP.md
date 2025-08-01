@@ -4,7 +4,7 @@ This guide will help you set up GitHub authentication to complete the deployment
 
 ## Prerequisites
 
-1. **GitHub Repository Owner Access**: You must have Owner permissions for the `steveraju/ucip` repository
+1. **GitHub Repository Owner Access**: You must have Owner permissions for the `estebillan/ucip` repository
 2. **DigitalOcean Account**: Access to your DigitalOcean account
 3. **Personal Access Token**: A DigitalOcean Personal Access Token
 
@@ -23,7 +23,7 @@ This guide will help you set up GitHub authentication to complete the deployment
 1. Visit: https://cloud.digitalocean.com/apps/github/install
 2. This will walk you through the GitHub authentication process
 3. Grant DigitalOcean App Platform access to your GitHub account
-4. Select the `steveraju/ucip` repository
+4. Select the `estebillan/ucip` repository
 
 ### Option B: Deploy Sample App First
 1. Go to [DigitalOcean App Platform](https://cloud.digitalocean.com/apps)
@@ -35,7 +35,7 @@ This guide will help you set up GitHub authentication to complete the deployment
 
 ## Step 3: Configure Repository Secrets
 
-1. Go to your GitHub repository: `https://github.com/steveraju/ucip`
+1. Go to your GitHub repository: `https://github.com/estebillan/ucip`
 2. Click **Settings** → **Secrets and variables** → **Actions**
 3. Click **"New repository secret"**
 4. Name: `DIGITALOCEAN_ACCESS_TOKEN`
@@ -54,9 +54,9 @@ doctl apps update 5698aa9c-1da8-40a4-8a48-d1a56bd883ee --spec .do/app.yaml
 ## Step 5: Repository Information
 
 ### Repository Details:
-- **Name**: `steveraju/ucip`
+- **Name**: `estebillan/ucip`
 - **Full Name**: Universal Consultant Intelligence Platform
-- **URL**: https://github.com/steveraju/ucip
+- **URL**: https://github.com/estebillan/ucip
 - **Purpose**: AI-powered research and intelligence platform for consultants
 
 ### App Specification
@@ -66,7 +66,7 @@ name: consultant-intelligence-platform
 static_sites:
 - name: demo-site
   github:
-    repo: steveraju/ucip
+    repo: estebillan/ucip
     branch: main
     deploy_on_push: true
   source_dir: static-demo
@@ -83,7 +83,7 @@ The current configuration deploys as a static site for reliability:
 ## Troubleshooting
 
 ### If GitHub Authentication Fails:
-1. Check repository permissions (must be Owner of steveraju/ucip)
+1. Check repository permissions (must be Owner of estebillan/ucip)
 2. Try the one-click setup: https://cloud.digitalocean.com/apps/github/install
 3. Revoke and re-grant GitHub permissions in your GitHub account settings
 
@@ -93,7 +93,7 @@ The current configuration deploys as a static site for reliability:
 3. Ensure token is correctly added to GitHub secrets
 
 ### Repository Access Issues:
-1. Confirm repository name is exactly: `steveraju/ucip`
+1. Confirm repository name is exactly: `estebillan/ucip`
 2. Ensure repository is public or DigitalOcean has been granted access to private repos
 3. Verify you have Owner permissions on the repository
 
@@ -120,6 +120,6 @@ The deployed static site will showcase:
 - [DigitalOcean App Platform Documentation](https://docs.digitalocean.com/products/app-platform/)
 - [GitHub Actions for App Platform](https://github.com/digitalocean/app_action)
 - [DigitalOcean Community Support](https://www.digitalocean.com/community/questions)
-- [Repository URL](https://github.com/steveraju/ucip)
+- [Repository URL](https://github.com/estebillan/ucip)
 
 Once GitHub authentication is set up, the Universal Consultant Intelligence Platform will be fully deployed and accessible!

@@ -58,11 +58,11 @@ setup_github_auth() {
     log "📂 Step 2: Checking GitHub repository..."
     
     CURRENT_REPO=$(git config --get remote.origin.url 2>/dev/null || echo "")
-    if [[ $CURRENT_REPO == *"ravinderraju/clientraker"* ]]; then
+    if [[ $CURRENT_REPO == *"estebillan/ucip"* ]]; then
         success "Correct repository: $CURRENT_REPO"
     else
         warning "Repository might not be correctly configured"
-        log "Expected: ravinderraju/clientraker"
+        log "Expected: estebillan/ucip"
         log "Current: $CURRENT_REPO"
     fi
     
@@ -81,10 +81,10 @@ setup_github_auth() {
     echo "2. 🔗 Complete GitHub Authentication:"
     echo "   → Visit: https://cloud.digitalocean.com/apps/github/install"
     echo "   → Grant DigitalOcean access to your GitHub account"
-    echo "   → Select the 'ravinderraju/clientraker' repository"
+    echo "   → Select the 'estebillan/ucip' repository"
     echo
     echo "3. 🔑 Add Token to GitHub Secrets:"
-    echo "   → Go to: https://github.com/ravinderraju/clientraker/settings/secrets/actions"
+    echo "   → Go to: https://github.com/estebillan/ucip/settings/secrets/actions"
     echo "   → Click 'New repository secret'"
     echo "   → Name: 'DIGITALOCEAN_ACCESS_TOKEN'"
     echo "   → Value: [Paste your DigitalOcean token]"

@@ -33,7 +33,7 @@ jobs:
         echo "🎉 Universal Consultant Intelligence Platform Deployment"
         echo "📦 App Name: consultant-intelligence-platform"
         echo "🌍 Region: NYC"
-        echo "📂 Source: GitHub (steveraju/ucip)"
+        echo "📂 Source: GitHub (estebillan/ucip)"
         echo "🚀 Auto-deploy: Enabled on main branch"
         echo ""
         echo "🔗 Access your app at the URL provided in the DigitalOcean dashboard"

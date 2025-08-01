@@ -3,7 +3,7 @@
 > AI-powered research and intelligence platform for consultants
 
 [![Deploy to DigitalOcean](https://img.shields.io/badge/Deploy%20to-DigitalOcean-0080FF?style=for-the-badge&logo=digitalocean)](https://cloud.digitalocean.com/apps)
-[![GitHub](https://img.shields.io/badge/GitHub-steveraju%2Fucip-181717?style=for-the-badge&logo=github)](https://github.com/steveraju/ucip)
+[![GitHub](https://img.shields.io/badge/GitHub-estebillan%2Fucip-181717?style=for-the-badge&logo=github)](https://github.com/estebillan/ucip)
 
 ## 🚀 Overview
 
@@ -50,7 +50,7 @@ The Universal Consultant Intelligence Platform is a comprehensive AI-powered sol
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/steveraju/ucip.git
+   git clone https://github.com/estebillan/ucip.git
    cd ucip
    ```
 
