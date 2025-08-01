@@ -30,7 +30,9 @@
       "Bash(git restore:*)",
       "Bash(./quick-setup.sh:*)",
       "Bash(docker-compose up:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(code:*)",
+      "Bash(npx playwright test:*)"
     ],
     "deny": []
   }

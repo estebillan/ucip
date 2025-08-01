@@ -1,0 +1,78 @@
+# Universal Consultant Intelligence Platform - Python Dependencies
+
+# FastAPI Framework and Dependencies
+fastapi[all]==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database and ORM
+sqlalchemy[asyncio]==2.0.23
+sqlmodel==0.0.8
+alembic==1.12.1
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+
+# Data Validation and Serialization
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# AI and Machine Learning
+openai==1.3.0
+tiktoken==0.5.1
+numpy==1.24.3
+scikit-learn==1.3.0
+
+# Web Scraping and HTTP
+beautifulsoup4==4.12.2
+aiohttp==3.9.0
+requests==2.31.0
+lxml==4.9.3
+html5lib==1.1
+
+# Data Processing and Analysis
+pandas==2.1.3
+openpyxl==3.1.2
+
+# PDF Generation
+reportlab==4.0.7
+Pillow==10.0.1
+matplotlib==3.7.2
+
+# Caching and Background Tasks
+redis==5.0.1
+celery==5.3.4
+
+# Utilities and Helpers
+python-dotenv==1.0.0
+tenacity==8.2.3
+structlog==23.2.0
+python-multipart==0.0.6
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Email
+aiosmtplib==3.0.1
+jinja2==3.1.2
+
+# HTTP and Security
+httpx==0.25.2
+cryptography==41.0.7
+python-dateutil==2.8.2
+
+# Development and Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+httpx==0.25.2
+
+# Code Quality and Linting
+ruff==0.1.6
+mypy==1.7.1
+bandit==1.7.5
+
+# Monitoring and Observability
+prometheus-client==0.19.0
+sentry-sdk==1.38.0
+
+# Rate Limiting
+slowapi==0.1.9

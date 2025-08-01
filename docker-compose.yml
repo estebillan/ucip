@@ -1,0 +1,219 @@
+# Universal Consultant Intelligence Platform - Docker Compose Configuration
+# Development and Production Environment Setup
+
+version: '3.8'
+
+services:
+  # =============================================================================
+  # PostgreSQL Database
+  # =============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: ucip-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-consultant_intelligence}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-securepassword}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-consultant_intelligence}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================================
+  # Redis Cache and Task Queue
+  # =============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: ucip-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redispassword}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================================
+  # Main Application (Backend + Frontend)
+  # =============================================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      cache_from:
+        - consultant-intelligence:latest
+    container_name: ucip-app
+    environment:
+      # Database Configuration
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-securepassword}@postgres:5432/${POSTGRES_DB:-consultant_intelligence}
+      
+      # Redis Configuration
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redispassword}@redis:6379/0
+      
+      # API Keys (use environment variables or secrets)
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      
+      # Application Settings
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      DEBUG: ${DEBUG:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      
+      # Security
+      SECRET_KEY: ${SECRET_KEY:-your-super-secret-key-change-in-production}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:8000}
+      
+      # Email Configuration (optional)
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      
+      # File Storage
+      REPORTS_DIR: /app/reports
+      LOGS_DIR: /app/logs
+      
+    volumes:
+      - app_logs:/app/logs
+      - app_reports:/app/reports
+      - app_data:/app/data
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    networks:
+      - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "/app/healthcheck.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # =============================================================================
+  # Nginx Reverse Proxy (Production)
+  # =============================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: ucip-nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - app_logs:/var/log/nginx
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    networks:
+      - app-network
+    depends_on:
+      - app
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # =============================================================================
+  # Background Task Worker (Celery)
+  # =============================================================================
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: ucip-worker
+    command: ["python", "-m", "celery", "worker", "-A", "backend.core.celery_app", "--loglevel=info"]
+    environment:
+      # Same environment as main app
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-securepassword}@postgres:5432/${POSTGRES_DB:-consultant_intelligence}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redispassword}@redis:6379/0
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - app_logs:/app/logs
+      - app_reports:/app/reports
+      - app_data:/app/data
+    networks:
+      - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # =============================================================================
+  # Celery Beat Scheduler
+  # =============================================================================
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: ucip-scheduler
+    command: ["python", "-m", "celery", "beat", "-A", "backend.core.celery_app", "--loglevel=info"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-securepassword}@postgres:5432/${POSTGRES_DB:-consultant_intelligence}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redispassword}@redis:6379/0
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - app_data:/app/data
+    networks:
+      - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - production
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  app_logs:
+    driver: local
+  app_reports:
+    driver: local
+  app_data:
+    driver: local

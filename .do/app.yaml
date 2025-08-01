@@ -1,0 +1,52 @@
+name: consultant-intelligence-platform
+region: nyc
+
+# Static site deployment for reliable hosting
+static_sites:
+- name: demo-site
+  github:
+    repo: IncomeStreamSurfer/context-engineering-intro
+    branch: main
+    deploy_on_push: true
+  source_dir: static-demo
+  build_command: |
+    echo "Building Universal Consultant Intelligence Platform demo..."
+    echo "No build steps required for static HTML"
+  output_dir: "."
+  index_document: index.html
+  error_document: index.html
+  routes:
+  - path: /
+
+# Future: Full application deployment (uncomment when needed)
+# services:
+# - name: api
+#   github:
+#     repo: IncomeStreamSurfer/context-engineering-intro
+#     branch: main
+#     deploy_on_push: true
+#   dockerfile_path: Dockerfile.simple
+#   envs:
+#   - key: ENVIRONMENT
+#     value: production
+#   - key: DEBUG
+#     value: "false"
+#   instance_size_slug: basic-xxs
+#   instance_count: 1
+#   http_port: 8080
+#   routes:
+#   - path: /api
+
+# Monitoring and alerts
+alerts:
+- rule: CPU_UTILIZATION
+  disabled: false
+  operator: GREATER_THAN
+  value: 80
+  window: 5m
+
+- rule: MEM_UTILIZATION
+  disabled: false
+  operator: GREATER_THAN
+  value: 80
+  window: 5m

@@ -1,0 +1,156 @@
+# Development Environment Docker Compose Override
+# This file extends the base docker-compose.yml for development
+
+version: '3.8'
+
+services:
+  # Development database with exposed port and dev settings
+  postgres:
+    environment:
+      POSTGRES_DB: consultant_intelligence_dev
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+
+  # Development Redis
+  redis:
+    environment:
+      REDIS_PASSWORD: dev_redis_pass
+    ports:
+      - "6380:6379"  # Different port to avoid conflicts
+    volumes:
+      - redis_dev_data:/data
+
+  # Development app with hot reload
+  app:
+    build:
+      target: backend-builder  # Use builder stage for development
+    environment:
+      DATABASE_URL: postgresql://dev_user:dev_password@postgres:5432/consultant_intelligence_dev
+      REDIS_URL: redis://:dev_redis_pass@redis:6379/0
+      ENVIRONMENT: development
+      DEBUG: "true"
+      LOG_LEVEL: DEBUG
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-your-openai-key-here}
+      SECRET_KEY: dev-secret-key-not-for-production
+      ALLOWED_HOSTS: "*"
+      CORS_ORIGINS: "*"
+    volumes:
+      # Mount source code for hot reload
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      - ./tests:/app/tests
+      - dev_logs:/app/logs
+      - dev_reports:/app/reports
+    ports:
+      - "8001:8000"  # Different port for dev
+    command: ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  # Frontend development server (if using a build process)
+  frontend-dev:
+    image: node:18-alpine
+    container_name: ucip-frontend-dev
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    command: |
+      sh -c "
+        if [ -f package.json ]; then
+          npm install
+          npm run dev
+        else
+          echo 'No package.json found, serving static files'
+          npx http-server src -p 3000 --cors
+        fi
+      "
+    environment:
+      NODE_ENV: development
+    networks:
+      - app-network
+    profiles:
+      - frontend
+
+  # Development database admin (pgAdmin)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ucip-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@consultant.local
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+    profiles:
+      - admin
+
+  # Redis admin interface
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: ucip-redis-commander
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:dev_redis_pass
+      HTTP_USER: admin
+      HTTP_PASSWORD: admin123
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+    depends_on:
+      - redis
+    profiles:
+      - admin
+
+  # Test runner container
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend-builder
+    container_name: ucip-test-runner
+    environment:
+      DATABASE_URL: postgresql://dev_user:dev_password@postgres:5432/consultant_intelligence_test
+      REDIS_URL: redis://:dev_redis_pass@redis:6379/1
+      ENVIRONMENT: testing
+      DEBUG: "true"
+      OPENAI_API_KEY: test-key
+    volumes:
+      - ./backend:/app/backend
+      - ./tests:/app/tests
+      - ./playwright.config.js:/app/playwright.config.js
+      - test_data:/app/test_data
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+      - redis
+    command: |
+      sh -c "
+        echo 'Waiting for services to be ready...'
+        sleep 10
+        echo 'Running Python tests...'
+        python -m pytest tests/ -v
+        echo 'Running Playwright tests...'
+        npx playwright install
+        npx playwright test
+      "
+    profiles:
+      - test
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+  pgadmin_data:
+  dev_logs:
+  dev_reports:
+  test_data:
