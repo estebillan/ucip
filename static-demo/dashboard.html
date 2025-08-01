@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCIP Dashboard - Universal Consultant Intelligence Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .navbar {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .status-online {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+        
+        .status-offline {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+        
+        .demo-note {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🧠 UCIP Dashboard</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="#" onclick="showStatus()">Status</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="demo-note">
+            ⚠️ <strong>Demo Mode:</strong> This is a functional demo of the Universal Consultant Intelligence Platform. 
+            Backend API integration will be available once the full stack is deployed with database and Redis.
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Company Research Card -->
+            <div class="card">
+                <h3>🔍 Smart Company Research</h3>
+                <form id="researchForm">
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" id="companyName" name="companyName" placeholder="e.g., Microsoft, Tesla, Acme Corp" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="companyDomain">Company Website</label>
+                        <input type="url" id="companyDomain" name="companyDomain" placeholder="https://example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="researchObjectives">Research Objectives</label>
+                        <textarea id="researchObjectives" name="researchObjectives" rows="3" placeholder="Growth signals, hiring trends, technology stack, market expansion..."></textarea>
+                    </div>
+                    <button type="submit" class="btn">
+                        <span>🔍</span> Start Research
+                    </button>
+                </form>
+                <div id="researchResults" class="results" style="display: none;"></div>
+                <div id="researchLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing company intelligence...</p>
+                </div>
+            </div>
+
+            <!-- Signal Detection Card -->
+            <div class="card">
+                <h3>📊 Signal Detection</h3>
+                <form id="signalForm">
+                    <div class="form-group">
+                        <label for="signalType">Signal Type</label>
+                        <select id="signalType" name="signalType" required>
+                            <option value="">Select signal type...</option>
+                            <option value="hiring">Hiring & Expansion</option>
+                            <option value="funding">Funding & Investment</option>
+                            <option value="product">Product Launch</option>
+                            <option value="technology">Technology Stack</option>
+                            <option value="partnership">Partnerships</option>
+                            <option value="market">Market Expansion</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="signalData">Signal Content</label>
+                        <textarea id="signalData" name="signalData" rows="4" placeholder="Paste news article, job posting, press release, or other signal content..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn">
+                        <span>📊</span> Analyze Signal
+                    </button>
+                </form>
+                <div id="signalResults" class="results" style="display: none;"></div>
+                <div id="signalLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Processing signal analysis...</p>
+                </div>
+            </div>
+
+            <!-- Email Generation Card -->
+            <div class="card">
+                <h3>📧 Email Generation</h3>
+                <form id="emailForm">
+                    <div class="form-group">
+                        <label for="prospectName">Prospect Name</label>
+                        <input type="text" id="prospectName" name="prospectName" placeholder="John Smith" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prospectTitle">Prospect Title</label>
+                        <input type="text" id="prospectTitle" name="prospectTitle" placeholder="VP of Engineering, CTO, etc." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prospectCompany">Company</label>
+                        <input type="text" id="prospectCompany" name="prospectCompany" placeholder="Company name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailObjective">Email Objective</label>
+                        <select id="emailObjective" name="emailObjective" required>
+                            <option value="">Select objective...</option>
+                            <option value="intro">Introduction</option>
+                            <option value="follow-up">Follow-up</option>
+                            <option value="proposal">Proposal Discussion</option>
+                            <option value="meeting">Meeting Request</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">
+                        <span>📧</span> Generate Email
+                    </button>
+                </form>
+                <div id="emailResults" class="results" style="display: none;"></div>
+                <div id="emailLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Crafting personalized email...</p>
+                </div>
+            </div>
+
+            <!-- Platform Status Card -->
+            <div class="card">
+                <h3>⚡ Platform Status</h3>
+                <div style="margin-bottom: 1rem;">
+                    <div class="status-indicator status-online">
+                        <span>🟢</span> Frontend: Online
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div class="status-indicator status-offline">
+                        <span>🔴</span> Backend API: Demo Mode
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div class="status-indicator status-offline">
+                        <span>🔴</span> Database: Not Connected
+                    </div>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <div class="status-indicator status-online">
+                        <span>🟢</span> OpenRouter API: Ready
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="checkPlatformStatus()" style="margin-top: 1rem;">
+                    <span>🔄</span> Refresh Status
+                </button>
+                
+                <div class="results" style="margin-top: 1rem;">
+                    <strong>Next Steps:</strong>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Deploy full stack with PostgreSQL database</li>
+                        <li>Add Redis for caching and background tasks</li>
+                        <li>Enable real-time API endpoints</li>
+                        <li>Connect OpenRouter for AI processing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate API calls for demo purposes
+        
+        // Company Research Form
+        document.getElementById('researchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const loading = document.getElementById('researchLoading');
+            const results = document.getElementById('researchResults');
+            
+            loading.classList.add('active');
+            results.style.display = 'none';
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            const companyName = document.getElementById('companyName').value;
+            const objectives = document.getElementById('researchObjectives').value;
+            
+            loading.classList.remove('active');
+            results.style.display = 'block';
+            results.innerHTML = `
+                <h4>Research Results for ${companyName}</h4>
+                <p><strong>Status:</strong> Demo simulation completed</p>
+                <p><strong>Objectives Analyzed:</strong> ${objectives || 'General company intelligence'}</p>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(76, 175, 80, 0.1); border-radius: 5px;">
+                    <strong>Demo Output:</strong>
+                    <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                        <li>🎯 Company growth signals detected</li>
+                        <li>📈 Recent hiring trends analyzed</li>
+                        <li>💡 Technology stack insights gathered</li>
+                        <li>🔍 Market positioning evaluated</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-style: italic;">
+                        In production: This would connect to OpenRouter API for real AI analysis using GPT-4 or Claude.
+                    </p>
+                </div>
+            `;
+        });
+        
+        // Signal Analysis Form
+        document.getElementById('signalForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const loading = document.getElementById('signalLoading');
+            const results = document.getElementById('signalResults');
+            
+            loading.classList.add('active');
+            results.style.display = 'none';
+            
+            await new Promise(resolve => setTimeout(resolve, 2500));
+            
+            const signalType = document.getElementById('signalType').value;
+            const signalData = document.getElementById('signalData').value.substring(0, 100);
+            
+            loading.classList.remove('active');
+            results.style.display = 'block';
+            results.innerHTML = `
+                <h4>Signal Analysis: ${signalType}</h4>
+                <p><strong>Content Preview:</strong> ${signalData}...</p>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(33, 150, 243, 0.1); border-radius: 5px;">
+                    <strong>Analysis Results:</strong>
+                    <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                        <li>📊 Priority Score: 8.5/10</li>
+                        <li>⏰ Timing: Immediate opportunity</li>
+                        <li>💼 Business Impact: High potential</li>
+                        <li>🎯 Recommended Action: Contact within 48 hours</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-style: italic;">
+                        In production: OpenRouter API would provide detailed AI-powered signal analysis.
+                    </p>
+                </div>
+            `;
+        });
+        
+        // Email Generation Form
+        document.getElementById('emailForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const loading = document.getElementById('emailLoading');
+            const results = document.getElementById('emailResults');
+            
+            loading.classList.add('active');
+            results.style.display = 'none';
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const prospectName = document.getElementById('prospectName').value;
+            const prospectTitle = document.getElementById('prospectTitle').value;
+            const prospectCompany = document.getElementById('prospectCompany').value;
+            const objective = document.getElementById('emailObjective').value;
+            
+            loading.classList.remove('active');
+            results.style.display = 'block';
+            results.innerHTML = `
+                <h4>Generated Email</h4>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(156, 39, 176, 0.1); border-radius: 5px;">
+                    <p><strong>To:</strong> ${prospectName} (${prospectTitle})</p>
+                    <p><strong>Company:</strong> ${prospectCompany}</p>
+                    <p><strong>Subject:</strong> Quick question about ${prospectCompany}'s ${objective === 'intro' ? 'growth strategy' : 'upcoming initiatives'}</p>
+                    <hr style="margin: 1rem 0; border-color: rgba(255,255,255,0.2);">
+                    <p><strong>Email Preview:</strong></p>
+                    <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 5px; margin-top: 0.5rem;">
+                        Hi ${prospectName},<br><br>
+                        I noticed ${prospectCompany}'s recent activities and thought you might be interested in...<br><br>
+                        [AI-generated personalized content would appear here]<br><br>
+                        Best regards,<br>
+                        [Your name]
+                    </div>
+                    <p style="margin-top: 1rem; font-style: italic;">
+                        In production: OpenRouter would generate fully personalized emails using AI models.
+                    </p>
+                </div>
+            `;
+        });
+        
+        function checkPlatformStatus() {
+            // Simulate status check
+            setTimeout(() => {
+                alert('🔄 Status Check Complete!\n\n✅ Frontend: Operational\n⚠️ Backend: Demo Mode\n⚡ Ready for full deployment with database and AI integration');
+            }, 500);
+        }
+        
+        function showStatus() {
+            alert('🧠 Universal Consultant Intelligence Platform\n\n📊 Current Status: Demo Mode\n🔧 Backend: OpenRouter Integration Ready\n🎯 Features: Company Research, Signal Analysis, Email Generation\n\n🚀 Ready for full stack deployment!');
+        }
+    </script>
+</body>
+</html>
